@@ -7,7 +7,7 @@ function setup() {
 
   const playerBoardHeight = 10;
   const playerBoardWidth = 80;
-  const playerBoardStartPosition = { x: width / 2 - playerBoardWidth / 2, y: height - 10 };
+  const playerBoardStartPosition = { x: width / 2, y: height - 10 };
   board = createBoard(playerBoardStartPosition, playerBoardWidth, playerBoardHeight, "grey");
 
   const ballSize = 10;
@@ -102,10 +102,10 @@ function createBoxCollider(x, y, width, height) {
   }
 }
 
-function createBoard(position, width, height, color) {
+function createBoard(position, boardWidth, height, color) {
   return {
     position: position,
-    width: width,
+    width: boardWidth,
     height: height,
     color: color,
     boardSpeed: 8,
@@ -113,17 +113,21 @@ function createBoard(position, width, height, color) {
       fill(this.color);
       rect(this.position.x - this.width / 2, this.position.y - this.height, this.width, this.height);
 
-      this.collider.draw();
-      stroke("red");
-      strokeWeight(1);
-      circle(this.position.x, this.position.y, 2);
+      //this.collider.draw();
+      //stroke("red");
+      //strokeWeight(1);
+      //circle(this.position.x, this.position.y, 2);
     },
     move: function (direction) {
-      this.position.x += direction * this.boardSpeed;
+      let newPosition = { x: this.position.x + direction * this.boardSpeed, y: this.position.y };
+      if (newPosition.x - this.width / 2 < 0) newPosition.x = 0 + this.width / 2;
+      if (newPosition.x + this.width / 2 > width) newPosition.x = width - this.width / 2;
+
+      this.position = newPosition;
       this.collider.x = this.position.x - this.width / 2;
       this.collider.y = this.position.y - this.height;
     },
-    collider: createBoxCollider(position.x - width / 2, position.y, width, height)
+    collider: createBoxCollider(position.x - boardWidth / 2, position.y, boardWidth, height)
   }
 }
 
@@ -137,7 +141,7 @@ function createBall(position, size) {
       stroke("black");
       circle(this.position.x, this.position.y, this.size);
 
-      this.collider.draw();
+      //this.collider.draw();
     },
     update: function () {
       this.position.x += this.velocity.x;
