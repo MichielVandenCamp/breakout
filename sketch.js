@@ -41,6 +41,11 @@ function draw() {
   board.move(playerMovement);
   ball.update();
 
+  if (frameCount % (60 * 10) == 0) {
+    ball.velocity.x *= 1.1;
+    ball.velocity.y *= 1.1;
+  }
+
   for (let i = 0; i < level.blocks.length; i++) {
     if (level.blocks[i].collider.isColliding(ball.collider)) {
       ball.velocity.y *= -1;
