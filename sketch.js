@@ -1,5 +1,6 @@
 let board = null;
 let ball = null;
+let level = null;
 
 function setup() {
   createCanvas(400, 400);
@@ -12,6 +13,13 @@ function setup() {
   const ballSize = 10;
   const ballStartPosition = { x: board.position.x + (board.width / 2), y: board.position.y - (ballSize / 2) - board.height };
   ball = createBall(ballStartPosition, ballSize);
+
+  level = createLevel([
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 0, 0, 0, 0, 1, 1, 1],
+    [1, 1, 1, 1, 0, 0, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+  ])
 }
 
 function draw() {
@@ -33,6 +41,14 @@ function draw() {
   board.move(playerMovement);
   ball.update();
 
+  for (let i = 0; i < level.blocks.length; i++) {
+    if (level.blocks[i].collider.isColliding(ball.collider)) {
+      ball.velocity.y *= -1;
+      level.blocks.splice(i, 1);
+      break;
+    }
+  }
+
   if (isBallCollidingWithRightSide() || isBallCollidingWithLeftSide()) {
     ball.velocity.x *= -1;
   }
@@ -45,6 +61,7 @@ function draw() {
 
   if (ball.sticksToBoard) ball.position.x = board.position.x;
   ball.draw();
+  level.draw();
 }
 
 function isBallCollidingWithRightSide() {
@@ -131,4 +148,55 @@ function createBall(position, size) {
     },
     collider: createBoxCollider(position.x - size / 2, position.y - size / 2, size, size)
   }
+}
+
+function createBlock(position, color) {
+  const width = 40;
+  const height = 20;
+
+  return {
+    position: position,
+    width: width,
+    height: height,
+    color: color,
+    draw: function () {
+      fill(this.color);
+      rect(this.position.x, this.position.y, this.width, this.height);
+    },
+    collider: createBoxCollider(position.x, position.y, width, height)
+  }
+}
+
+function createLevel(level) {
+  const blocks = [];
+  const blockWidth = 40;
+  const blockHeight = 20;
+
+  for (let i = 0; i < level.length; i++) {
+    for (let j = 0; j < level[i].length; j++) {
+      if (level[i][j] > 0) {
+        blocks.push(createBlock({ x: j * blockWidth, y: i * blockHeight }, getBlockColor(i)));
+      }
+    }
+  }
+
+  return {
+    blocks: blocks,
+    draw: function () {
+      this.blocks.forEach(block => block.draw());
+    }
+  };
+}
+
+function getBlockColor(y) {
+  if (y == 0) {
+    return color(0, 0, 255);
+  }
+  else if (y == 1) {
+    return color(0, 80, 180);
+  }
+  else if (y == 2) {
+    return color(0, 120, 120);
+  }
+  return "green";
 }
