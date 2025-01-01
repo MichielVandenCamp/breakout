@@ -23,29 +23,54 @@ function setup() {
 }
 
 function draw() {
+  checkUserInput();
+  increaseBallSpeedOverTime();
+
+  ball.update();
+  checkCollision();
+
+  // Move ball with board when sticking to it
+  if (ball.sticksToBoard) ball.position.x = board.position.x;
+
+  drawGame();
+}
+
+function drawGame() {
   background(220);
 
-  let playerMovement = 0;
+  board.draw();
+  ball.draw();
+  level.draw();
+}
+
+function increaseBallSpeedOverTime() {
+  // Every 600 frames (10 seconds) increase the speed of the ball
+  const shouldIncreaseSpeedThisFrame = frameCount % (60 * 10) == 0;
+  if (shouldIncreaseSpeedThisFrame) {
+    ball.velocity.x *= 1.1;
+    ball.velocity.y *= 1.1;
+  }
+}
+
+function checkUserInput() {
+  let playerMoveDirection = 0;
   if (keyIsDown(LEFT_ARROW)) {
-    playerMovement = -1;
+    playerMoveDirection = -1;
   }
   else if (keyIsDown(RIGHT_ARROW)) {
-    playerMovement = 1;
+    playerMoveDirection = 1;
   }
 
-  if (keyIsDown(32)) {
+  const isSpacePressed = keyIsDown(32);
+  if (isSpacePressed) {
     ball.sticksToBoard = false;
     ball.velocity = { x: 2, y: -2 };
   }
 
-  board.move(playerMovement);
-  ball.update();
+  board.move(playerMoveDirection);
+}
 
-  if (frameCount % (60 * 10) == 0) {
-    ball.velocity.x *= 1.1;
-    ball.velocity.y *= 1.1;
-  }
-
+function checkCollision() {
   for (let i = 0; i < level.blocks.length; i++) {
     if (level.blocks[i].collider.isColliding(ball.collider)) {
       ball.velocity.y *= -1;
@@ -61,12 +86,6 @@ function draw() {
   if (isBallCollidingWithTopSide() || board.collider.isColliding(ball.collider)) {
     ball.velocity.y *= -1;
   }
-
-  board.draw();
-
-  if (ball.sticksToBoard) ball.position.x = board.position.x;
-  ball.draw();
-  level.draw();
 }
 
 function isBallCollidingWithRightSide() {
