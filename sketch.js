@@ -14,6 +14,9 @@ function setup() {
   const ballStartPosition = { x: board.position.x + (board.width / 2), y: board.position.y - (ballSize / 2) - board.height };
   ball = createBall(ballStartPosition, ballSize);
 
+  // 1 marks a block, 0 marks an empty space
+  // The blocks are drawn from top to bottom
+  // The idea is that 2, 3, 4, etc would be able to define different powerups
   level = createLevel([
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     [1, 1, 1, 0, 0, 0, 0, 1, 1, 1],
